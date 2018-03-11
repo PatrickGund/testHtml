@@ -12,13 +12,13 @@ async function getTours(url) {
   console.log('STEP 1: getting HTML')
   let html = await axios('https://phish.net/tour/', {crossdomain: true });
   console.log('html', html);
-//   let html = await axios.get(url)
-//   let $ = cheerio.load(html.data)
- let $ = html.data;
+  // let html = await axios.get(url)
+  let $ = cheerio.load(html.data)
+//  let $ = html.data;
  console.log('$', $);
 
   console.log('STEP 2: parsing HTML')
-  $('a').each(function (i, element) {
+  await $('a').each(function (i, element) {
     let show = $(element).attr('href');
     showArr.push(show)
   })
@@ -46,6 +46,8 @@ async function getTodaysShows(storageArr) {
 
     if (i === storageArr.length - 1) {
       console.log("shows", shows)
+      chrome.runtime.sendMessage(shows)
+
       todaysShows = shows
       let htmlStr = ''
       if(shows.length === 0) {
@@ -58,7 +60,7 @@ async function getTodaysShows(storageArr) {
             htmlStr = shows[j]
           }
         }
-        console.log('htmlStr', htmlStr)
+        return htmlStr;
       }
       //THIS IS WHERE I NEED TO PASS THE RESULT - htmlStr to popup.js
       //HOW DO I EXPORT???
@@ -134,19 +136,20 @@ async function getShows(url) {
   // fs.writeFile('shows.txt', showArr.join('\n'));
   console.log("TODAYS SHOWS FOR EXPORT", todaysShows)
 
-  chrome.runtime.sendMessage(todaysShows)
   return todaysShows
 }
+var newShowData;
 async function execute () {
 
 await getTours('https://phish.net/tour/')
   .then(function (storage) {
-    getTodaysShows(storage)
+    return getTodaysShows(storage)
   }).then(function (result) {
-    // console.log('result', result)
+    chrome.runtime.sendMessage(todaysShows)
+    module.exports = result;
   })
   .catch(err => console.error(err))
 }
 
 execute();
-module.exports = todaysShows
+

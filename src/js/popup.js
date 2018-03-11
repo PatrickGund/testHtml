@@ -31,7 +31,6 @@ function getCurrentTabUrl(callback) {
     // from |queryInfo|), then the "tabs" permission is required to see their
     // "url" properties.
     console.assert(typeof url == 'string', 'tab.url should be a string');
-    console.log('scrape',scrape);
 
     callback(url);
   });
@@ -110,8 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(container)
     // console.log('window.todaysShows', window.todaysShows)
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-      console.log('window.todaysShows', window.todaysShows)
-      document.getElementById('placeHere').append(window.todaysShows[0])
+      // console.log('window.todaysShows', window.todaysShows)
+      console.log('req', request);
+      console.log('sender', sender);
+      console.log('sendResponse', sendResponse);
+      document.getElementById('placeHere').append(request[0]);
     })
 
     let d = new Date();
